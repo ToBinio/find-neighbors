@@ -8,7 +8,7 @@ import java.util.List;
  * @author Tobias Frischmann
  */
 
-public interface NeighborFinder<T extends Position> {
+public interface NeighborFinderI<T extends Position> {
 
     void add(T obj);
 

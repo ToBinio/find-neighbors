@@ -1,4 +1,7 @@
-package at.tobinio;
+package at.tobinio.spacialHashmap;
+
+import at.tobinio.NeighborFinder;
+import at.tobinio.Position;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,31 +12,20 @@ import java.util.List;
  * @author Tobias Frischmann
  */
 
-public class SpacialHashmap<T> implements NeighborFinder<T> {
+public class SpacialHashmap<T extends Position> extends NeighborFinder<T> {
 
-    private final double minX;
-    private final double width;
 
-    private final double minY;
-    private final double height;
+    private final List<List<T>> map;
 
     private final int rowCount;
     private final int columnCount;
-
-    private final List<List<T>> map;
 
     public SpacialHashmap(double width, double height, int rowCount, int columnCount) {
         this(0, width, 0, height, rowCount, columnCount);
     }
 
     public SpacialHashmap(double minX, double maxX, double minY, double maxY, int rowCount, int columnCount) {
-        if (maxX < minX) throw new IllegalArgumentException("maxX can not be larger than minX");
-        this.minX = minX;
-        this.width = maxX - minX;
-
-        if (maxY < minY) throw new IllegalArgumentException("maxY can not be larger than minY");
-        this.minY = minY;
-        this.height = maxY - minY;
+        super(minX, maxX, minY, maxY);
 
         if (rowCount <= 0) throw new IllegalArgumentException("rowCount must be larger than 0");
         this.rowCount = rowCount;
@@ -47,12 +39,11 @@ public class SpacialHashmap<T> implements NeighborFinder<T> {
         for (int i = 0; i < rowCount * columnCount; i++) {
             map.add(new ArrayList<>());
         }
-
     }
 
     @Override
-    public void add(double x, double y, T obj) {
-        map.get((int) ((y / height * rowCount) * columnCount + (x / width * columnCount))).add(obj);
+    public void add(T obj) {
+        map.get((int) ((int) ((obj.getY() - minY) / height * rowCount) * columnCount + ((obj.getX() - minX) / width * columnCount))).add(obj);
     }
 
     @Override
@@ -62,31 +53,41 @@ public class SpacialHashmap<T> implements NeighborFinder<T> {
         }
     }
 
+    private int[] getMinMaxValues(double x1, double y1, double x2, double y2) {
+        if (x1 > x2) throw new IllegalArgumentException("x1 can not be larger than x2");
+
+        if (y1 > y2) throw new IllegalArgumentException("y1 can not be larger than y2");
+
+
+        int[] values = new int[4];
+
+        values[0] = (int) Math.max(Math.floor((x1 - minX) / width * columnCount), 0);
+        values[1] = (int) Math.min(Math.ceil((x2 - minX) / width * columnCount), columnCount - 1);
+
+        values[2] = (int) Math.max(Math.floor((y1 - minY) / height * rowCount), 0);
+        values[3] = (int) Math.min(Math.ceil((y2 - minY) / height * rowCount), rowCount - 1);
+
+        return values;
+    }
+
     @Override
     public List<T> getInBox(double x1, double y1, double x2, double y2) {
-        if (x1 > x2) {
-            double temp = x1;
-            x1 = x2;
-            x2 = temp;
-        }
 
-        if (y1 > y2) {
-            double temp = y1;
-            y1 = y2;
-            y2 = temp;
-        }
-
-        int minX = (int) (x1 / width * columnCount);
-        int maxX = (int) (x2 / width * columnCount);
-
-        int minY = (int) (y1 / height * rowCount);
-        int maxY = (int) (y2 / height * rowCount);
+        int[] minMaxValues = getMinMaxValues(x1, y1, x2, y2);
 
         ArrayList<T> list = new ArrayList<>();
 
-        for (int i = minX; i <= maxX; i++) {
-            for (int j = minY; j <= maxY; j++) {
-                list.addAll(map.get(i + j * columnCount));
+        for (int i = minMaxValues[0]; i <= minMaxValues[1]; i++) {
+            for (int j = minMaxValues[2]; j <= minMaxValues[3]; j++) {
+
+                for (T potential : map.get(i + j * columnCount)) {
+
+                    if (potential.getX() >= x1 && potential.getX() <= x2 && potential.getY() >= y1 && potential.getY() <= y2) {
+                        list.add(potential);
+                    }
+
+                }
+
             }
         }
 
@@ -95,6 +96,27 @@ public class SpacialHashmap<T> implements NeighborFinder<T> {
 
     @Override
     public List<T> getInCircle(double centerX, double centerY, double radius) {
-        return null;
+        if (radius <= 0) throw new IllegalArgumentException("radius musst be larger than 0");
+
+        int[] minMaxValues = getMinMaxValues(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
+
+        ArrayList<T> list = new ArrayList<>();
+
+        for (int i = minMaxValues[0]; i <= minMaxValues[1]; i++) {
+            for (int j = minMaxValues[2]; j <= minMaxValues[3]; j++) {
+
+                for (T potential : map.get(i + j * columnCount)) {
+
+                    if ((Math.sqrt((centerX - potential.getX()) * (centerX - potential.getX()) + (centerY - potential.getY()) * (centerY - potential.getY())) <= radius))
+                        list.add(potential);
+
+                }
+
+            }
+        }
+
+        return list;
     }
 }
+
+
