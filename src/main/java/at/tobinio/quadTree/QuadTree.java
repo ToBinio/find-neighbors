@@ -31,6 +31,9 @@ public class QuadTree<T extends Position> extends NeighborFinder<T> {
 
     @Override
     public void add(T obj) {
+        if (minY > obj.getY() || minY + height < obj.getY() || minX > obj.getX() || minX + width < obj.getX())
+            throw new IllegalArgumentException("obj outOffBounce");
+        
         mainNode.add(obj);
     }
 

@@ -65,37 +65,35 @@ public class QuadTreeNode<T extends Position> {
         }
     }
 
-    public List<T> getInBox(double x1, double y1, double x2, double y2, List<T> list) {
+    public void getInBox(double x1, double y1, double x2, double y2, List<T> list) {
 
         for (Position obj : data) {
-            if (obj == null) return list;
+            if (obj == null) return;
 
             if (obj.getX() >= x1 && obj.getX() <= x2 && obj.getY() >= y1 && obj.getY() <= y2) {
                 list.add((T) obj);
             }
         }
 
-        if (nodeTopRight == null) return list;
+        if (nodeTopRight == null) return;
 
         if (nodeTopRight.isOverlapping(x1, y1, x2, y2)) nodeTopRight.getInBox(x1, y1, x2, y2, list);
         if (nodeTopLeft.isOverlapping(x1, y1, x2, y2)) nodeTopLeft.getInBox(x1, y1, x2, y2, list);
         if (nodeBottomRight.isOverlapping(x1, y1, x2, y2)) nodeBottomRight.getInBox(x1, y1, x2, y2, list);
         if (nodeBottomLeft.isOverlapping(x1, y1, x2, y2)) nodeBottomLeft.getInBox(x1, y1, x2, y2, list);
-
-        return list;
     }
 
-    public List<T> getInCircle(double centerX, double centerY, double radius, List<T> list) {
+    public void getInCircle(double centerX, double centerY, double radius, List<T> list) {
 
         for (Position obj : data) {
-            if (obj == null) return list;
+            if (obj == null) return;
 
             if ((Math.sqrt((centerX - obj.getX()) * (centerX - obj.getX()) + (centerY - obj.getY()) * (centerY - obj.getY())) <= radius)) {
                 list.add((T) obj);
             }
         }
 
-        if (nodeTopRight == null) return list;
+        if (nodeTopRight == null) return;
 
         if (nodeTopRight.isOverlapping(centerX, centerY, radius))
             nodeTopRight.getInCircle(centerX, centerY, radius, list);
@@ -106,7 +104,6 @@ public class QuadTreeNode<T extends Position> {
         if (nodeBottomLeft.isOverlapping(centerX, centerY, radius))
             nodeBottomLeft.getInCircle(centerX, centerY, radius, list);
 
-        return list;
     }
 
     public boolean isOverlapping(double x1, double y1, double x2, double y2) {

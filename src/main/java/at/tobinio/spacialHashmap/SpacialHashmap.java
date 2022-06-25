@@ -43,6 +43,9 @@ public class SpacialHashmap<T extends Position> extends NeighborFinder<T> {
 
     @Override
     public void add(T obj) {
+        if (minY > obj.getY() || minY + height < obj.getY() || minX > obj.getX() || minX + width < obj.getX())
+            throw new IllegalArgumentException("obj outOffBounce");
+
         map.get((int) ((int) ((obj.getY() - minY) / height * rowCount) * columnCount + ((obj.getX() - minX) / width * columnCount))).add(obj);
     }
 

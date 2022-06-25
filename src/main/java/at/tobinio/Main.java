@@ -1,6 +1,5 @@
 package at.tobinio;
 
-import at.toBinio.Timer;
 import at.tobinio.quadTree.QuadTree;
 import at.tobinio.spacialHashmap.SpacialHashmap;
 
@@ -24,28 +23,19 @@ public class Main {
 
         int radius = 5;
 
-        Timer neighbors = new Timer("Neighbors", true);
+        testNeighborFinder(spacialFinder, "Spacial", list, radius);
+        testNeighborFinder(quadTreeFinder, "QuadTree", list, radius);
 
-        testNeighborFinder(neighbors, spacialFinder, "Spacial", list, radius);
-        testNeighborFinder(neighbors, quadTreeFinder, "QuadTree", list, radius);
-
-        neighbors.stop();
     }
 
-    private static void testNeighborFinder(Timer timer, NeighborFinder<TestObj> finder, String name, TestObj[] list,
+    private static void testNeighborFinder(NeighborFinder<TestObj> finder, String name, TestObj[] list,
             int radius) {
-        timer.startSubTimer(name);
-        timer.startSubTimer("creation");
         for (TestObj testObj : list) {
             finder.add(testObj);
         }
-        timer.stopSubTimer();
-        timer.startSubTimer("neighbors");
         for (TestObj testObj : list) {
             finder.getInCircle(testObj.getX(), testObj.getY(), radius);
         }
-        timer.stopSubTimer();
-        timer.stopSubTimer();
     }
 
 }
