@@ -103,14 +103,20 @@ public class SpacialHashmap<T extends Position> extends NeighborFinder<T> {
 
         int[] minMaxValues = getMinMaxValues(centerX - radius, centerY - radius, centerX + radius, centerY + radius);
 
+        double width = this.width / columnCount;
+        double height = this.height / rowCount;
+
         ArrayList<T> list = new ArrayList<>();
 
         for (int i = minMaxValues[0]; i <= minMaxValues[1]; i++) {
             for (int j = minMaxValues[2]; j <= minMaxValues[3]; j++) {
 
+                if (!isOverlapping(centerX, centerY, radius, i * width + minX, j * height + minY, width, height))
+                    continue;
+
                 for (T potential : map.get(i + j * columnCount)) {
 
-                    if ((Math.sqrt((centerX - potential.getX()) * (centerX - potential.getX()) + (centerY - potential.getY()) * (centerY - potential.getY())) <= radius))
+                    if ((centerX - potential.getX()) * (centerX - potential.getX()) + (centerY - potential.getY()) * (centerY - potential.getY()) <= radius * radius)
                         list.add(potential);
 
                 }

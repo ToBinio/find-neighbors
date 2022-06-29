@@ -28,4 +28,25 @@ public abstract class NeighborFinder<T extends Position> implements NeighborFind
         this.minY = minY;
         this.height = maxY - minY;
     }
+
+    public static boolean isOverlapping(double centerX, double centerY, double radius, double borderX, double borderY,
+            double width, double height) {
+
+        // temporary variables to set edges for testing
+        double testX = centerX;
+        double testY = centerY;
+
+        // which edge is closest?
+        if (centerX < borderX) testX = borderX;      // test left edge
+        else if (centerX > borderX + width) testX = borderX + width;   // right edge
+        if (centerY < borderY) testY = borderY;      // top edge
+        else if (centerY > borderY + height) testY = borderY + height;   // bottom edge
+
+        // get distance from the closest edges
+        double distX = centerX - testX;
+        double distY = centerY - testY;
+
+        // if the distance is less than the radius, collision!
+        return (distX * distX) + (distY * distY) <= radius * radius;
+    }
 }

@@ -33,13 +33,13 @@ public class QuadTree<T extends Position> extends NeighborFinder<T> {
     public void add(T obj) {
         if (minY > obj.getY() || minY + height < obj.getY() || minX > obj.getX() || minX + width < obj.getX())
             throw new IllegalArgumentException("obj outOffBounce");
-        
+
         mainNode.add(obj);
     }
 
     @Override
     public void clear() {
-        mainNode = new QuadTreeNode<T>(minX, minY, width, height, nodeCapacity);
+        mainNode = new QuadTreeNode<>(minX, minY, width, height, nodeCapacity);
     }
 
     @Override
@@ -53,7 +53,6 @@ public class QuadTree<T extends Position> extends NeighborFinder<T> {
 
     @Override
     public List<T> getInCircle(double centerX, double centerY, double radius) {
-
         List<T> list = new ArrayList<>();
 
         mainNode.getInCircle(centerX, centerY, radius, list);

@@ -1,5 +1,6 @@
 package at.tobinio.quadTree;
 
+import at.tobinio.NeighborFinder;
 import at.tobinio.Position;
 
 import java.util.List;
@@ -39,6 +40,7 @@ public class QuadTreeNode<T extends Position> {
         if (dataCount < data.length) {
             data[dataCount] = obj;
             dataCount++;
+
         } else {
 
             if (nodeBottomLeft == null) {
@@ -88,7 +90,7 @@ public class QuadTreeNode<T extends Position> {
         for (Position obj : data) {
             if (obj == null) return;
 
-            if ((Math.sqrt((centerX - obj.getX()) * (centerX - obj.getX()) + (centerY - obj.getY()) * (centerY - obj.getY())) <= radius)) {
+            if ((centerX - obj.getX()) * (centerX - obj.getX()) + (centerY - obj.getY()) * (centerY - obj.getY()) <= radius * radius) {
                 list.add((T) obj);
             }
         }
@@ -107,31 +109,11 @@ public class QuadTreeNode<T extends Position> {
     }
 
     public boolean isOverlapping(double x1, double y1, double x2, double y2) {
-        if (x1 > x + width || x2 < x) return false;
-        if (y1 > y + height || y2 < y) return false;
-
-        return true;
+        return !(x1 > x + width) && !(x2 < x) && !(y1 > y + height) && !(y2 < y);
     }
 
-    boolean isOverlapping(double centerX, double centerY, double radius) {
-
-        // temporary variables to set edges for testing
-        double testX = centerX;
-        double testY = centerY;
-
-        // which edge is closest?
-        if (centerX < x) testX = x;      // test left edge
-        else if (centerX > x + width) testX = x + width;   // right edge
-        if (centerY < y) testY = y;      // top edge
-        else if (centerY > y + height) testY = y + height;   // bottom edge
-
-        // get distance from the closest edges
-        double distX = centerX - testX;
-        double distY = centerY - testY;
-        double distance = Math.sqrt((distX * distX) + (distY * distY));
-
-        // if the distance is less than the radius, collision!
-        return distance <= radius;
+    private boolean isOverlapping(double centerX, double centerY, double radius) {
+        return NeighborFinder.isOverlapping(centerX, centerY, radius, x, y, width, height);
     }
 
 }
