@@ -1,6 +1,5 @@
 package at.tobinio;
 
-import at.toBinio.timer.BasicTimer;
 import at.tobinio.quadTree.QuadTree;
 import at.tobinio.spacialHashmap.SpacialHashmap;
 
@@ -26,13 +25,9 @@ public class Main {
 
         int radius = 5;
 
-        BasicTimer mapBasicTimer = new BasicTimer("Map");
         testNeighborFinder(spacialFinder, "Spacial", list, radius);
-        mapBasicTimer.stop();
 
-        BasicTimer treeBasicTimer = new BasicTimer("Tree");
         testNeighborFinder(quadTreeFinder, "QuadTree", list, radius);
-        treeBasicTimer.stop();
 
         System.out.println(compare(quadTreeFinder.getInCircle(0, 0, 10), spacialFinder.getInCircle(0, 0, 10)));
     }
